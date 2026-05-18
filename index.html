@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Programming Concepts Check</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+ 
     <style>
         :root {
             --primary: #77a766;
@@ -13,7 +13,7 @@
             --accent: #e8d227;
             --light: #f2f1e8;
         }
-
+ 
         body, html {
             margin: 0;
             padding: 0;
@@ -28,13 +28,13 @@
             color: var(--dark);
             overflow: hidden;
         }
-
+ 
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
+ 
         #quiz-container {
             background-color: var(--light);
             width: 90%;
@@ -45,17 +45,17 @@
             text-align: center;
             position: relative;
         }
-
+ 
         h2 { font-weight: 700; margin-bottom: 20px; text-transform: lowercase; }
         h2::first-letter { text-transform: uppercase; }
-
+ 
         .question { font-size: 1.25rem; margin-bottom: 25px; line-height: 1.4; font-weight: 500; }
-
+ 
         .options-grid {
             display: grid;
             gap: 12px;
         }
-
+ 
         button {
             background-color: #ffffff;
             border: 2px solid var(--primary);
@@ -68,13 +68,13 @@
             color: var(--dark);
             text-align: left;
         }
-
+ 
         button:hover {
             background-color: var(--primary);
             color: white;
             transform: translateY(-2px);
         }
-
+ 
         #feedback {
             margin-top: 25px;
             font-weight: 500;
@@ -82,12 +82,12 @@
             padding: 10px;
             border-radius: 8px;
         }
-
+ 
         .correct { color: var(--primary); border: 1px solid var(--primary); background: #eef5ed; }
         .wrong { color: #cc3300; border: 1px solid #cc3300; background: #fceceb; }
-
+ 
         .hidden { display: none; }
-
+ 
         #score-screen h1 { color: var(--primary); font-size: 4rem; margin: 10px 0; }
         
         .retry-btn {
@@ -98,25 +98,33 @@
             text-align: center !important;
             width: 200px;
         }
-
+ 
         .progress {
             font-size: 0.9rem;
             color: #666;
             margin-bottom: 10px;
         }
+ 
+        .symbol-container {
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
-
+ 
 <div id="quiz-container">
     <div id="question-screen">
         <div class="progress" id="progress-text">Question 1 of 7</div>
         <h2 id="q-title">Algorithm mastery</h2>
+        <div id="symbol-area"></div>
         <div class="question" id="q-text">Loading question...</div>
         <div class="options-grid" id="options"></div>
         <div id="feedback"></div>
     </div>
-
+ 
     <div id="score-screen" class="hidden">
         <h2>Quiz complete</h2>
         <p>Your final score is:</p>
@@ -125,8 +133,10 @@
         <button onclick="location.reload()" class="retry-btn">Restart quiz</button>
     </div>
 </div>
-
+ 
 <script>
+ 
+ 
     const quizData = [
         {
             q: "A robot program uses 'subroutine TurnRight()'. What is the term for the unique name 'TurnRight'?",
@@ -137,7 +147,8 @@
                 "A loop counter"
             ],
             correct: "An identifier",
-            feedback: "An identifier is the unique name given to a sub-routine so it can be called."
+            feedback: "An identifier is the unique name given to a sub-routine so it can be called.",
+            symbol: null
         },
         {
             q: "In an algorithm for a login system, a block of code starts with 'subroutine ValidatePIN()'. How must this block end?",
@@ -148,7 +159,8 @@
                 "return"
             ],
             correct: "endsubroutine",
-            feedback: "The keyword 'endsubroutine' marks the end of the self-contained block."
+            feedback: "The keyword 'endsubroutine' marks the end of the self-contained block.",
+            symbol: null
         },
         {
             q: "Why is using a sub-routine better than writing the same instructions multiple times?",
@@ -159,18 +171,8 @@
                 "It deletes unused variables"
             ],
             correct: "The code is written once but can be used many times",
-            feedback: "This avoids code repetition and makes management much easier."
-        },
-        {
-            q: "A flowchart shows a rectangle containing 'CalculateTotal()'. What does this symbol represent?",
-            options: [
-                "A call to a sub-routine",
-                "An input from a sensor",
-                "A decision point",
-                "The end of the program"
-            ],
-            correct: "A call to a sub-routine",
-            feedback: "Using the identifier inside a rectangle indicates a sub-routine call."
+            feedback: "This avoids code repetition and makes management much easier.",
+            symbol: null
         },
         {
             q: "How can a programmer use a sub-routine they created in one part of an algorithm in a completely different algorithm?",
@@ -181,7 +183,8 @@
                 "By changing it into a diamond shape"
             ],
             correct: "By calling its identifier in the new program",
-            feedback: "Sub-routines are portable and can be reused across different programs."
+            feedback: "Sub-routines are portable and can be reused across different programs.",
+            symbol: null
         },
         {
             q: "Which best describes a sub-routine?",
@@ -192,7 +195,8 @@
                 "A type of internet connection"
             ],
             correct: "A self-contained program called from another program",
-            feedback: "It is a modular part of an algorithm designed for a specific task."
+            feedback: "It is a modular part of an algorithm designed for a specific task.",
+            symbol: null
         },
         {
             q: "In pseudocode, which syntax is used to trigger the sub-routine named 'DisplayScore'?",
@@ -203,27 +207,70 @@
                 "repeat score"
             ],
             correct: "DisplayScore()",
-            feedback: "You use the identifier followed by parentheses to call the sub-routine."
+            feedback: "You use the identifier followed by parentheses to call the sub-routine.",
+            symbol: null
         }
     ];
-
+ 
     let currentQuestion = 0;
     let score = 0;
-
+ 
     const qText = document.getElementById('q-text');
     const optionsContainer = document.getElementById('options');
     const feedback = document.getElementById('feedback');
     const questionScreen = document.getElementById('question-screen');
     const scoreScreen = document.getElementById('score-screen');
     const progressText = document.getElementById('progress-text');
-
+    const symbolArea = document.getElementById('symbol-area');
+ 
+    function launchConfetti() {
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+        document.body.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const colors = ['#77a766', '#e8d227', '#f2f1e8', '#ffffff', '#232323'];
+        const particles = Array.from({ length: 150 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            w: Math.random() * 10 + 5,
+            h: Math.random() * 6 + 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            vx: (Math.random() - 0.5) * 3,
+            vy: Math.random() * 4 + 2,
+            angle: Math.random() * 360,
+            spin: (Math.random() - 0.5) * 6
+        }));
+        let frame = 0;
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                ctx.save();
+                ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+                ctx.rotate((p.angle * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                ctx.restore();
+                p.x += p.vx;
+                p.y += p.vy;
+                p.angle += p.spin;
+                if (p.y > canvas.height) p.y = -20;
+            });
+            frame++;
+            if (frame < 180) requestAnimationFrame(draw);
+            else canvas.remove();
+        }
+        draw();
+    }
+ 
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
     }
-
+ 
     function loadQuestion() {
         feedback.innerHTML = "";
         feedback.className = "";
@@ -232,10 +279,17 @@
         
         progressText.innerText = `Question ${currentQuestion + 1} of ${quizData.length}`;
         qText.innerText = data.q;
-
+ 
+        // Show or hide symbol
+        if (data.symbol) {
+            symbolArea.innerHTML = data.symbol;
+        } else {
+            symbolArea.innerHTML = "";
+        }
+ 
         let shuffledOptions = [...data.options];
         shuffleArray(shuffledOptions);
-
+ 
         shuffledOptions.forEach((opt) => {
             const btn = document.createElement('button');
             btn.innerText = opt;
@@ -243,7 +297,7 @@
             optionsContainer.appendChild(btn);
         });
     }
-
+ 
     function checkAnswer(selected, correct) {
         const data = quizData[currentQuestion];
         const buttons = optionsContainer.getElementsByTagName('button');
@@ -254,7 +308,7 @@
             feedback.className = "correct";
             
             for(let b of buttons) b.style.pointerEvents = "none";
-
+ 
             setTimeout(() => {
                 currentQuestion++;
                 if (currentQuestion < quizData.length) {
@@ -268,24 +322,18 @@
             feedback.className = "wrong";
         }
     }
-
+ 
     function showScore() {
         questionScreen.classList.add('hidden');
         scoreScreen.classList.remove('hidden');
         document.getElementById('final-score').innerText = `${score} / ${quizData.length}`;
         
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#77a766', '#e8d227', '#f2f1e8']
-        });
+        launchConfetti();
     }
-
-    // Shuffle questions once at the start
+ 
     shuffleArray(quizData);
     loadQuestion();
 </script>
-
+ 
 </body>
 </html>
